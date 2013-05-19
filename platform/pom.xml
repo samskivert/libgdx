@@ -22,6 +22,7 @@
     <sourceDirectory>src</sourceDirectory>
 
     <plugins>
+      <!-- first download an unpack the native libraries -->
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>maven-download-plugin</artifactId>
@@ -44,7 +45,7 @@
             <phase>process-resources</phase>
             <goals><goal>wget</goal></goals>
             <configuration>
-              <cacheDirectory>${project.build.directory}/download-cache</cacheDirectory>
+              <cacheDirectory>${project.build.directory}/download-cache/armeabi</cacheDirectory>
               <url>${base.url}/armeabi/libandroidgl20.so</url>
               <outputDirectory>${project.build.directory}/armeabi</outputDirectory>
             </configuration>
@@ -54,7 +55,7 @@
             <phase>process-resources</phase>
             <goals><goal>wget</goal></goals>
             <configuration>
-              <cacheDirectory>${project.build.directory}/download-cache</cacheDirectory>
+              <cacheDirectory>${project.build.directory}/download-cache/armeabi</cacheDirectory>
               <url>${base.url}/armeabi/libgdx.so</url>
               <outputDirectory>${project.build.directory}/armeabi</outputDirectory>
             </configuration>
@@ -65,7 +66,7 @@
             <phase>process-resources</phase>
             <goals><goal>wget</goal></goals>
             <configuration>
-              <cacheDirectory>${project.build.directory}/download-cache</cacheDirectory>
+              <cacheDirectory>${project.build.directory}/download-cache/armeabi-v7a</cacheDirectory>
               <url>${base.url}/armeabi-v7a/libandroidgl20.so</url>
               <outputDirectory>${project.build.directory}/armeabi-v7a</outputDirectory>
             </configuration>
@@ -75,13 +76,69 @@
             <phase>process-resources</phase>
             <goals><goal>wget</goal></goals>
             <configuration>
-              <cacheDirectory>${project.build.directory}/download-cache</cacheDirectory>
+              <cacheDirectory>${project.build.directory}/download-cache/armeabi-v7a</cacheDirectory>
               <url>${base.url}/armeabi-v7a/libgdx.so</url>
               <outputDirectory>${project.build.directory}/armeabi-v7a</outputDirectory>
             </configuration>
           </execution>
         </executions>
       </plugin>
+
+      <!-- if we have pre-built versions, replace the downloaded versions with those -->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>copy-local-desktop</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource><directory>${basedir}/../gdx/libs/linux32</directory></resource>
+                <resource><directory>${basedir}/../gdx/libs/linux64</directory></resource>
+                <resource><directory>${basedir}/../gdx/libs/macosx32</directory></resource>
+                <resource><directory>${basedir}/../gdx/libs/windows32</directory></resource>
+                <resource><directory>${basedir}/../gdx/libs/windows64</directory></resource>
+              </resources>
+              <outputDirectory>${basedir}/target/desktop</outputDirectory>
+              <overwrite>true</overwrite>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-local-armeabi</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource><directory>${basedir}/../gdx/libs/armeabi</directory></resource>
+              </resources>
+              <outputDirectory>${basedir}/target/armeabi</outputDirectory>
+              <overwrite>true</overwrite>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-local-armeabi-v7a</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource><directory>${basedir}/../gdx/libs/armeabi-v7a</directory></resource>
+              </resources>
+              <outputDirectory>${basedir}/target/armeabi-v7a</outputDirectory>
+              <overwrite>true</overwrite>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- finally package everything up into jar files -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.4</version>
